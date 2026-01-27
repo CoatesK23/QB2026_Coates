@@ -1,6 +1,6 @@
 ---
 title: '5\. Worksheet: Alpha Diversity'
-author: "Student Name; Z620: Quantitative Biodiversity, Indiana University"
+author: "Kelsey Coates; Z620: Quantitative Biodiversity, Indiana University"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
 geometry: margin = 2.54cm
@@ -78,7 +78,7 @@ S.obs <- function(x = ""){
 }
 
 S.obs(BCI[1,])
-site1
+
 
 specnumber(BCI)
 specnumber(BCI[1,])
@@ -290,13 +290,6 @@ RAC <- function(x = ""){
   return(x.ab.ranked)
 }
 
-
-
-
-
-
-
-
 ```
 
 Now, let us examine the RAC for `site1` of the BCI data set.
@@ -424,11 +417,6 @@ ShanH(site1)
 
 diversity(site1, index = "shannon")
 
-
-
-
-
-
 ```
 
 ### Simpson's diversity (or dominance)
@@ -461,12 +449,6 @@ D.sub
 diversity(site1, "inv")
 diversity(site1, "simp")
 
-
-
-
-
-
-
 ```
 
 ### Fisher's $\boldsymbol\alpha$
@@ -487,14 +469,6 @@ Fisher
 
 ShanH(site1)
 
-
-
-
-
-
-
-
-
 ```
 
 ***Question 7***: 
@@ -502,7 +476,7 @@ How is Fisher's $\boldsymbol\alpha$ different from $E_{H'}$ and $E_{var}$?
 What does Fisher's $\boldsymbol\alpha$ take into account that $E_{H'}$ and $E_{var}$ do not?
 
 > ***Answer 7***:
-> Fisher's alpha is not an evennes metric like $E_{H'}$ and $E_{var}$, Fisher's alpha is an estimate  
+> Fisher's alpha is not an evennes metric like $E_{H'}$ and $E_{var}$, Fisher's alpha is a diversity metric.
 
 ## 6) HILL NUMBERS 
 
@@ -510,11 +484,30 @@ Remember that we have learned about the advantages of Hill Numbers to measure an
 We also learned to explore the effects of rare species in a community by examining diversity for a series of exponents $q$. 
 
 ***Question 8***: Using `site1` of BCI and `vegan` package, a) calculate Hill numbers for $q$ exponent 0, 1 and 2 (richness, exponential Shannon's entropy, and inverse Simpson's diversity). b) Interpret the effect of rare species in your community based on the response of diversity to increasing exponent $q$. 
+```{r}
+
+# Hill number q = 0: Species richness 
+D0 <- specnumber(site1)
+
+# Hill number q = 1: Exponential Shannon entropy 
+H <- diversity(site1, index = "shannon") 
+D1 <- exp(H) 
+
+# Hill number q = 2: Inverse Simpson diversity 
+lambda <- diversity(site1, index = "simpson") 
+D2 <- 1 / lambda
+
+D0
+D1
+D2
+
+
+```
 
 > ***Answer 8a***:
->
+>93,55.6, 1.02
 > ***Answer 8b***:
->
+>  The community contains many rare species, but diversity is dominated by a smaller set of abundant species as q increases. As q increases, the weight of rare species decreases, meaning the abundance of rare species is not overestimated. 
 
 ## 7) MOVING BEYOND UNIVARIATE METRICS OF $\alpha$ DIVERSITY
 
@@ -538,8 +531,10 @@ In the R code chunk below, please do the following:
 3. Plot the results of the `radfit()` function using the code provided in the handout.
 
 ```{r}
-
-
+RACresults <- radfit(site1)
+RACresults
+plot.new()
+plot(RACresults, las = 1, cex.lab = 1.4, cex.axis = 1.25)
 
 
 
@@ -551,9 +546,9 @@ a) Based on the output of `radfit()` and plotting above, discuss which model bes
 b) Can we make any inferences about the forces, processes, and/or mechanisms influencing the structure of our system, e.g., an ecological community?
 
 > ***Answer 9a***: 
->
+> The Mandelbrot model fit the rank-abundance curve the best with both the lowest BIC and AIC. 
 > ***Answer 9b***:
->
+> The Mandelbrot model fitting the best suggests that there may be strong competitive forces in the community.  
 
 
 ***Question 10***: Answer the following questions about the preemption model:
@@ -561,26 +556,39 @@ a.  What does the preemption model assume about the relationship between total a
 b.  Why does the niche preemption model look like a straight line in the RAD plot?
 
 > ***Answer 10a***: 
->
+> The preemption model tells us that species abundance is directly related to resource availability and species will sequentially preempt the fraction of remaining resources until the resources run out. 
 > ***Answer 10b***:
->
+> The model looks like a straight line because as available resources decrease, so does the number of species reproducing. The log scale makes the line look straight. 
 
 
 ***Question 10***: Why is it important to account for the number of parameters a model uses when judging how well it explains a given set of data?
 
 > ***Answer 11***:
->
+> A model with many parameters could be overfit and thus tell us less about the results (meaning the ecological context is lost by fitting the noise), sometimes the best model is the one with the best fit with the least parameters. 
 
 ## SYNTHESIS
 
 1.  As stated by Magurran (2004) the  ${D = } \sum p_i^2$ derivation of Simpson's Diversity only applies to communities of infinite size. 
 For anything but an infinitely large community, Simpson's Diversity index is calculated as ${D = } \sum \frac{n_i(n_i -1)} {N(N-1)}$. 
 Assuming a finite community, calculate Simpson's D, 1 - D, and Simpson's inverse (i.e. 1/D) for `site 1` of the BCI site-by-species matrix. 
+```{r}
+SimpD(site1)
+D.inv <- 1/SimpD(site1)
+D.sub <- 1-SimpD(site1)
+
+```
+
 
 2.  Along with the rank-abundance curve (RAC), another way to visualize the distribution of abundance among species is with a histogram (a.k.a., frequency distribution) that shows the frequency of different abundance classes.
 For example, in a given sample, there may be 10 species represented by a single individual, 8 species with two individuals, 4 species with three individuals, and so on.
 In fact, the rank-abundance curve and the frequency distribution are the two most common ways to visualize the species-abundance distribution (SAD) and to test species abundance models and biodiversity theories.
 To address this homework question, use the R function **hist()** to plot the frequency distribution for `site 1` of the BCI site-by-species matrix, and describe the general pattern you see.
+```{r}
+site1 <- as.numeric(site1)
+hist(site1)
+
+```
+> This historgram shows that site one of the BCI dataset has many rare species
 
 3.  We asked you to find a biodiversity dataset with your partner.
 This data could be one of your own or it could be something that you obtained from the literature. 
@@ -588,6 +596,14 @@ Load that dataset.
 How many sites are there?
 How many species are there in the entire site-by-species matrix?
 Any other interesting observations based on what you learned this week?
+```{r}
+data(dune)
+nrow(dune) # Number of sites 
+ncol(dune) # Number of species 
+site2 <- as.numeric(dune[2,])
+hist(site2)
+```
+> The second site of the dune dataset has many rare species. 
 
 ## SUBMITTING YOUR ASSIGNMENT
 Use Knitr to create a PDF of your completed 5.AlphaDiversity_Worksheet.Rmd document, push it to GitHub, and create a pull request.
